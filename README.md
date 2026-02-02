@@ -2,7 +2,7 @@
 
 **SubTrack** is a professional SaaS platform designed to help users take full control of their digital subscriptions. Monitor spending, manage renewal dates, and optimize your monthly budget through a modern, high-performance interface.
 
-![SubTrack Dashboard Preview](https://raw.githubusercontent.com/aaronmfcr/mi-proyecto-saas/main/public/preview.png) *(Note: Placeholder for actual preview image)*
+![SubTrack Dashboard Preview] https://eironsaas-34jzjqrr0-aarons-projects-c1d9b32d.vercel.app/
 
 ## 🛠 Tech Stack
 
