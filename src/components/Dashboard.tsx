@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSubscriptions } from '../hooks/useSubscriptions';
+import { supabase } from '../lib/supabase';
 import { format } from 'date-fns';
 import {
     LayoutDashboard,
@@ -12,7 +13,9 @@ import {
     TrendingUp,
     Calendar,
     MoreHorizontal,
-    Layers
+    Layers,
+    LogOut,
+    User
 } from 'lucide-react';
 import { SubscriptionModal } from './SubscriptionModal';
 
@@ -26,10 +29,27 @@ const formatCurrency = (value: number) => {
 export const Dashboard = () => {
     const { subscriptions, loading, totalMonthlySpend, addSubscription } = useSubscriptions();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+    const [user, setUser] = useState<any>(null);
+
+    useEffect(() => {
+        const getUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+        };
+        getUser();
+    }, []);
+
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+    };
 
     const nextRenewal = subscriptions.length > 0
         ? [...subscriptions].sort((a, b) => new Date(a.renewal_date).getTime() - new Date(b.renewal_date).getTime())[0]
         : null;
+
+    const userInitial = user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U';
+    const displayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
 
     return (
         <div className="flex h-screen bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
@@ -61,14 +81,41 @@ export const Dashboard = () => {
                     </a>
                 </nav>
 
-                <div className="p-4 border-t border-slate-200 dark:border-border-dark">
-                    <div className="flex items-center gap-3 p-2">
-                        <div className="size-10 rounded-full bg-gradient-to-tr from-primary to-purple-400" />
-                        <div className="flex flex-col">
-                            <span className="text-sm font-semibold">User Name</span>
+                <div className="p-4 border-t border-slate-200 dark:border-border-dark relative">
+                    {isUserMenuOpen && (
+                        <div className="absolute bottom-full left-4 bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-xl shadow-xl w-56 mb-2 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200 z-50">
+                            <div className="p-3 border-b border-slate-100 dark:border-border-dark">
+                                <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">Signed in as</p>
+                                <p className="text-sm font-semibold truncate">{user?.email}</p>
+                            </div>
+                            <div className="p-1">
+                                <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors text-left">
+                                    <User className="size-4" />
+                                    Profile Settings
+                                </button>
+                                <button
+                                    onClick={handleLogout}
+                                    className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors text-left"
+                                >
+                                    <LogOut className="size-4" />
+                                    Sign Out
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    <button
+                        onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                        className={`w-full flex items-center gap-3 p-2 rounded-xl transition-all ${isUserMenuOpen ? 'bg-slate-100 dark:bg-surface-dark' : 'hover:bg-slate-50 dark:hover:bg-surface-dark/50'}`}
+                    >
+                        <div className="size-10 rounded-full bg-gradient-to-tr from-primary to-purple-400 flex items-center justify-center text-white font-bold text-sm shadow-inner shrink-0 leading-none">
+                            {userInitial.toUpperCase()}
+                        </div>
+                        <div className="flex flex-col text-left min-w-0">
+                            <span className="text-sm font-semibold truncate">{displayName}</span>
                             <span className="text-xs text-slate-500">Premium Account</span>
                         </div>
-                    </div>
+                    </button>
                 </div>
             </aside>
 
@@ -111,7 +158,7 @@ export const Dashboard = () => {
                                 </div>
                             </div>
                             <div className="flex items-baseline gap-2">
-                                <h3 className="text-3xl font-bold">{formatCurrency(totalMonthlySpend)}</h3>
+                                <h3 className="text-3xl font-bold text-primary-dark dark:text-white">{formatCurrency(totalMonthlySpend)}</h3>
                             </div>
                             <p className="text-xs text-slate-400 mt-2">Projection based on active apps</p>
                         </div>
@@ -197,8 +244,8 @@ export const Dashboard = () => {
                                                 <td className="px-6 py-4">{format(new Date(sub.renewal_date), 'MMM dd, yyyy')}</td>
                                                 <td className="px-6 py-4">
                                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${sub.status === 'active'
-                                                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400'
-                                                            : 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-400'
+                                                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400'
+                                                        : 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-400'
                                                         }`}>
                                                         {sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}
                                                     </span>
