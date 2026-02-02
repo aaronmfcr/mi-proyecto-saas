@@ -17,6 +17,7 @@ import {
     LogOut,
     User
 } from 'lucide-react';
+import logo from '../assets/logoeiron.svg';
 import { SubscriptionModal } from './SubscriptionModal';
 
 const formatCurrency = (value: number) => {
@@ -56,10 +57,10 @@ export const Dashboard = () => {
             {/* Sidebar */}
             <aside className="w-64 border-r border-slate-200 dark:border-border-dark flex flex-col h-screen sticky top-0 bg-white dark:bg-background-dark shadow-sm">
                 <div className="p-6 flex items-center gap-3">
-                    <div className="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
-                        <Layers className="size-5" />
+                    <div className="size-8 flex items-center justify-center">
+                        <img src={logo} alt="Logo" className="size-6" />
                     </div>
-                    <h1 className="text-xl font-bold tracking-tight">SubManager</h1>
+                    <h2 className="text-xl font-bold tracking-tight">SubManager</h2>
                 </div>
 
                 <nav className="flex-1 px-4 space-y-2 mt-4">

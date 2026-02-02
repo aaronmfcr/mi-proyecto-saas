@@ -1,73 +1,73 @@
-# React + TypeScript + Vite
+# SubTrack - Subscription Management SaaS 🚀
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**SubTrack** is a professional SaaS platform designed to help users take full control of their digital subscriptions. Monitor spending, manage renewal dates, and optimize your monthly budget through a modern, high-performance interface.
 
-Currently, two official plugins are available:
+![SubTrack Dashboard Preview](https://raw.githubusercontent.com/aaronmfcr/mi-proyecto-saas/main/public/preview.png) *(Note: Placeholder for actual preview image)*
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠 Tech Stack
 
-## React Compiler
+- **Frontend**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/) (Strict Mode)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Backend / Database**: [Supabase](https://supabase.com/) (PostgreSQL)
+- **Authentication**: Supabase Auth (Email/Password & Social)
+- **Form Handling**: React Hook Form + Zod
+- **Icons**: Lucide React
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ✨ Key Features
 
-## Expanding the ESLint configuration
+- **Personalized Dashboard**: Real-time view of monthly spending, next renewal dates, and total active subscriptions.
+- **Full Auth Flow**: Secure registration and login system with route protection.
+- **Subscription CRUD**: Add, view, and manage subscriptions with specific billing cycles (Weekly, Monthly, Quarterly, Yearly).
+- **Intelligent Formatting**: Automatic currency conversion and localized date formatting.
+- **Premium UI**: Dark mode core interface with mesh gradients and micro-animations for a high-end feel.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🧠 Technical Challenges & Solutions
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### 1. Hardening TypeScript for Production Builds
+One of the main challenges was ensuring perfect type-safety during the production build (`npm run build`). We encountered strict mismatches between **Zod schemas** and **React Hook Form** state, specifically regarding numeric coercion from HTML inputs.
+- **Solution**: Implemented `z.coerce.number()` in validation schemas and utilized the `{ valueAsNumber: true }` property in React Hook Form's register function. Additionally, we transitioned to `import type` for type-only dependencies to satisfy the `verbatimModuleSyntax` rule.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### 2. Multi-tenant Security via RLS
+Security is paramount in a SaaS managing financial data. We had to ensure users could only access their own data without complex backend middleware.
+- **Solution**: Leveraged Supabase's **Row Level Security (RLS)**. We defined policies at the database level that automatically filter results based on the `auth.uid()` of the requesting user, preventing any unauthorized data leakage between accounts.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🚀 Getting Started
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Prerequisites
+- Node.js (v18+)
+- A Supabase Project
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Installation
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/aaronmfcr/mi-proyecto-saas.git
+   cd mi-proyecto-saas
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Environment Variables**:
+   Create a `.env` file in the root and add your Supabase credentials:
+   ```env
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+
+4. **Database Setup**:
+   Run the migration found in `supabase/migrations/` in your Supabase SQL Editor to set up the `profiles` and `subscriptions` tables.
+
+5. **Start Development Server**:
+   ```bash
+   npm run dev
+   ```
+
+## 📄 License
+This project is licensed under the MIT License.
+
+---
+Built with ❤️ by [aaronmfcr](https://github.com/aaronmfcr)
