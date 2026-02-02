@@ -13,6 +13,9 @@ export const useSubscriptions = () => {
     const fetchSubscriptions = async () => {
         try {
             setLoading(true);
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return;
+
             const { data, error } = await supabase
                 .from('subscriptions')
                 .select('*')
@@ -39,10 +42,13 @@ export const useSubscriptions = () => {
                 .single();
 
             if (error) throw error;
+
+            // Update local state
             setSubscriptions((prev) => [...prev, data]);
             return { data, error: null };
         } catch (err) {
-            return { data: null, error: err instanceof Error ? err.message : 'An unknown error occurred' };
+            const msg = err instanceof Error ? err.message : 'An unknown error occurred';
+            return { data: null, error: msg };
         }
     };
 
@@ -66,7 +72,18 @@ export const useSubscriptions = () => {
     }, [subscriptions]);
 
     useEffect(() => {
+        // Escuchar cambios en auth para refrescar datos
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+            if (event === 'SIGNED_IN') {
+                fetchSubscriptions();
+            } else if (event === 'SIGNED_OUT') {
+                setSubscriptions([]);
+            }
+        });
+
         fetchSubscriptions();
+
+        return () => subscription.unsubscribe();
     }, []);
 
     return {
